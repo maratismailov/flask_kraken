@@ -12,6 +12,7 @@ def hello():
 
 @app.route('/download/<path:url>')
 def download(url):
+    print('url is ', url)
     myfile = requests.get(url, allow_redirects=True)
     content = myfile.headers.get('Content-Disposition')
     print('content is ', content)
@@ -20,6 +21,18 @@ def download(url):
     print(myfile.headers.get('Content-Disposition'))
     open(filename, 'wb').write(myfile.content)
     return send_file(filename, mimetype='application/zip', as_attachment=True, attachment_filename=filename)
+
+@app.route('/test/<path:url>')
+def test(url):
+    myfile = requests.get(url, allow_redirects=True)
+    content = myfile.headers.get('Content-Disposition')
+    print('content is ', content)
+    pre_filename = content[22:]
+    filename = pre_filename[:-1]
+    print(myfile.headers.get('Content-Disposition'))
+    # open(filename, 'wb').write(myfile.content)
+    # return send_file(filename, mimetype='application/zip', as_attachment=True, attachment_filename=filename)
+    return filename
 
 @app.route('/download/test')
 def testdownload():
