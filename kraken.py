@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import requests
+import glob
 
 app = Flask(__name__)
 CORS(app)
-
 
 @app.route('/')
 def hello():
@@ -38,6 +38,12 @@ def test(url):
 def testdownload():
     filename = 'test.mp4'
     return send_file(filename, as_attachment=True, attachment_filename=filename)
+
+
+@app.route('/list')
+def listfiles():
+    return jsonify(glob.glob('./*.zip'))
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
