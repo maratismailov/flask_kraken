@@ -20,8 +20,9 @@ def download(url):
     myfile = requests.get(url, allow_redirects=True)
     content = myfile.headers.get('Content-Disposition')
     # print('content is ', content)
-    pre_filename = content[22:]
-    filename = pre_filename[:-1]
+    pre_filename = content[21:]
+    # filename = pre_filename[:-1]
+    filename = pre_filename
     print(myfile.headers.get('Content-Disposition'))
     open(filename, 'wb').write(myfile.content)
     return send_file(filename, mimetype='application/zip', as_attachment=True, attachment_filename=filename)
