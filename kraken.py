@@ -3,6 +3,7 @@ from flask_cors import CORS
 import requests
 import glob
 import os
+import lxml.etree as ET
 import json
 from zipfile import ZipFile
 
@@ -30,6 +31,23 @@ def download(url):
     with ZipFile(filename, 'r') as zipObj:
         zipObj.extractall()
     return send_file(filename_unzipped, mimetype='text/html', as_attachment=True, attachment_filename=filename_unzipped)
+
+@app.route('/html/<path:url>')
+def html(url):
+    removedownloads()
+    myfile = requests.get(url, allow_redirects=True)
+    content = myfile.headers.get('Content-Disposition')
+    pre_filename = content[22:]
+    filename = pre_filename[:-1]
+    filename_unzipped = filename[:-4]
+    open(filename, 'wb').write(myfile.content)
+    with ZipFile(filename, 'r') as zipObj:
+        zipObj.extractall()
+    dom = ET.parse(filename_unzipped)
+    xslt = ET.parse('./FB2_2_xhtml.xsl')
+    transform = ET.XSLT(xslt)
+    newdom = transform(dom)
+    return ET.tounicode(newdom, pretty_print=True)
 
 
 @app.route('/test/<path:url>')
@@ -68,6 +86,7 @@ def removedownloads():
             os.remove(os.path.join(dir_name, item))
         elif item.endswith(".mobi"):
             os.remove(os.path.join(dir_name, item))
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
