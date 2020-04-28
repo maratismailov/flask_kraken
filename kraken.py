@@ -44,7 +44,7 @@ def html(url):
     with ZipFile(filename, 'r') as zipObj:
         zipObj.extractall()
     dom = ET.parse(filename_unzipped)
-    xslt = ET.parse('./FB2_2_xhtml.xsl')
+    xslt = ET.parse('./FB2_3_xhtml.xsl')
     transform = ET.XSLT(xslt)
     newdom = transform(dom)
     return ET.tounicode(newdom, pretty_print=True)
