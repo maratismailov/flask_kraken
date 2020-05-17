@@ -87,6 +87,10 @@ def removedownloads():
         elif item.endswith(".mobi"):
             os.remove(os.path.join(dir_name, item))
 
+@app.route('/nosleep')
+def nosleep():
+    return "nosleep"
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
