@@ -32,6 +32,7 @@ def download(url):
         zipObj.extractall()
     return send_file(filename_unzipped, mimetype='text/html', as_attachment=True, attachment_filename=filename_unzipped)
 
+
 @app.route('/html/<path:url>')
 def html(url):
     removedownloads()
@@ -87,10 +88,55 @@ def removedownloads():
         elif item.endswith(".mobi"):
             os.remove(os.path.join(dir_name, item))
 
+
 @app.route('/nosleep')
 def nosleep():
     return "nosleep"
 
+
+@app.route('/getdatafrombucket')
+def getdatafrombucket():
+    url_names = "https://x1cz0kcbm8.execute-api.eu-central-1.amazonaws.com/?method=readnamesfrombucket"
+    url_data = 'https://x1cz0kcbm8.execute-api.eu-central-1.amazonaws.com/?method=readfrombucket'
+
+    names = requests.get(url_names, allow_redirects=True).text
+    data = requests.get(url_data, allow_redirects=True).text
+
+    names_file = open('data/names.json', 'w')
+    names_file.write(names)
+    names_file.close
+
+    data_file = open('data/data.json', 'w')
+    data_file.write(data)
+    data_file.close
+   
+    return 'success'
+
+@app.route('/readnamesfromtemp')
+def readnamesfromtemp():
+    try:
+        names_file = open('data/names.json', 'r')
+        names = names_file.read()
+        names_file.close
+    except:
+        getdatafrombucket()
+        names_file = open('data/names.json', 'r')
+        names = names_file.read()
+        names_file.close
+    return names
+
+@app.route('/readdatafromtemp')
+def readdatafromtemp():
+    try:
+        data_file = open('data/data.json', 'r')
+        data = data_file.read()
+        data_file.close
+    except:
+        getdatafrombucket()
+        data_file = open('data/data.json', 'r')
+        data = data_file.read()
+        data_file.close
+    return data
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
