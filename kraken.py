@@ -138,5 +138,25 @@ def readdatafromtemp():
         data_file.close
     return data
 
+@app.route('/getcurrentdata')
+def getcurrentdata():
+    url = "https://data.sensor.community/airrohr/v1/filter/country=KG"
+
+    data = requests.get(url, allow_redirects=False, verify=False).text
+    data_file = open('data/current.json', 'w')
+    data_file.write(data)
+    data_file.close
+
+    return 'success'
+
+
+@app.route('/readcurrentdata')
+def readcurrentdata():
+    data_file = open('data/current.json', 'r')
+    data = data_file.read()
+    data_file.close
+   
+    return data
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
