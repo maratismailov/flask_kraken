@@ -157,15 +157,20 @@ def getcurrentdata():
 
 @app.route('/readcurrentdata')
 def readcurrentdata():
-    # форма для загрузки файла
-    data_file = open('data/current.json', 'r')
-    data = data_file.read()
-    data_file.close
-
+    try:
+        data_file = open('data/current.json', 'r')
+        data = data_file.read()
+        data_file.close
+    except:
+        getcurrentdata()
+        data_file = open('data/current.json', 'r')
+        data = data_file.read()
+        data_file.close
     return data
 
 @app.route('/drawplot')
 def drawplotinput():
+    # форма для загрузки файла
     return render_template('input.html')
 
 @app.route('/drawplot', methods=['POST'])
