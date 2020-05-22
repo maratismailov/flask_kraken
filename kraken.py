@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, make_response, render_template
 from flask_cors import CORS
 import requests
 import glob
@@ -6,6 +6,11 @@ import os
 import lxml.etree as ET
 import json
 from zipfile import ZipFile
+import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+import io
+
 
 app = Flask(__name__)
 CORS(app)
@@ -109,7 +114,7 @@ def getdatafrombucket():
     data_file = open('data/data.json', 'w')
     data_file.write(data)
     data_file.close
-   
+
     return 'success'
 
 @app.route('/readnamesfromtemp')
@@ -152,11 +157,51 @@ def getcurrentdata():
 
 @app.route('/readcurrentdata')
 def readcurrentdata():
+    # форма для загрузки файла
     data_file = open('data/current.json', 'r')
     data = data_file.read()
     data_file.close
-   
+
     return data
+
+@app.route('/drawplot')
+def drawplotinput():
+    return render_template('input.html')
+
+@app.route('/drawplot', methods=['POST'])
+def drawplot():
+    # получение загруженного файла
+    if request.method == 'POST':
+        if request.form['action'] == 'Upload':
+            file = request.files['file'].read().decode('utf8')
+
+    # преобразование строки из файла в объект
+    data = json.loads(file)
+    x = []
+    y = []
+
+    # формирование рядов координат
+    for xdata in data['lon']:
+        x.append(xdata)
+    for ydata in data['lat']:
+        y.append(ydata)
+    x = np.array(x)
+    y = np.array(y)
+
+    fig, ax = plt.subplots()
+
+    # создание полигона
+    ax.fill(x, y, fill=False)
+    ax.grid(True, zorder=5)
+    plt.show()
+
+    # отрисовка полигона
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
