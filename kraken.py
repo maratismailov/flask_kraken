@@ -193,7 +193,7 @@ def drawplot():
     # создание полигона
     ax.fill(x, y, fill=False)
     ax.grid(True, zorder=5)
-    plt.show()
+    # plt.show()
 
     # отрисовка полигона
     canvas = FigureCanvas(fig)
